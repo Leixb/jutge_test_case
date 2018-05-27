@@ -10,9 +10,12 @@ import (
 
 func test(input, prog string) (string, error) {
 	file := filepath.Base(prog)
+	if !check_code(prog) {
+		return "", errors.New("Invalid code")
+	}
 	_, err := os.Stat("./problemes/" + file)
 	if err != nil {
-		return "", errors.New("Invalid code")
+		return "", errors.New("Program not in database")
 	}
 	cmd := exec.Command("./problemes/" + file)
 	cmd.Stdin = strings.NewReader(input)
@@ -21,4 +24,11 @@ func test(input, prog string) (string, error) {
 		return "", errors.New("Entrada Invàlida")
 	}
 	return string(out), nil
+}
+
+func check_code(code string) bool {
+	if len(code) != 9 {
+		return false
+	}
+	return code_matcher.MatchString(code)
 }

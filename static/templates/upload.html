@@ -1,0 +1,21 @@
+{{define "title"}}{{.}}{{end}}
+{{define "content"}}
+<div class="header">
+    <h1>{{.}}</h1>
+</div>
+<div class="pure-g">
+    <div class="pure-u-1-1">
+        <a href="https://jutge.org/problems/{{.}}" target="_blank">
+            <img class="pure-img" src="https://jutge.org/problems/{{.}}/png" alt=""/>
+        </a>
+    </div>
+</div>
+<hr>
+<form class="pure-form pure-form-stacked" action="{{.}}", method="post">
+    <fieldset>
+        <legend>Provar cas de prova</legend>
+        <textarea class="pure-input-1" name="input" rows=20></textarea>
+        <button type="submit" class="pure-button pure-button-primary">Envia</button>
+    </fieldset>
+</form>
+{{end}}

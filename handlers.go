@@ -40,7 +40,6 @@ func problems(w http.ResponseWriter, r *http.Request) {
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
 		prog := filepath.Base(r.URL.String())
 		fmt.Println(prog, get_name(prog))
@@ -52,7 +51,6 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	} else {
 		r.ParseForm()
 		input := r.FormValue("input")
-		//prog := filepath.Base(r.FormValue("name"))
 		prog := filepath.Base(r.URL.String())
 		fmt.Println("prog:", prog)
 		output, err := test(input, prog)

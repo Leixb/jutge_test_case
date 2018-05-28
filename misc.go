@@ -1,11 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"errors"
+	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func test(input, prog string) (string, error) {
@@ -17,13 +21,56 @@ func test(input, prog string) (string, error) {
 	if err != nil {
 		return "", errors.New("Program not in database")
 	}
+
 	cmd := exec.Command("./problemes/" + file)
+
 	cmd.Stdin = strings.NewReader(input)
-	out, err := cmd.Output()
+
+	// Wait for the process to finish or kill it after a timeout:
+
+	var stdoutBuf bytes.Buffer
+
+	stdoutIn, _ := cmd.StdoutPipe()
+
+	var errStdout error
+	//stdout := io.MultiWriter(os.Stdout, &stdoutBuf)
+	stdout := &stdoutBuf
+	err = cmd.Start()
 	if err != nil {
-		return "", errors.New("Entrada Invàlida")
+		log.Fatalf("cmd.Start() failed with '%s'\n", err)
 	}
-	return string(out), nil
+
+	done := make(chan error, 1)
+
+	go func() {
+		_, errStdout = io.Copy(stdout, stdoutIn)
+	}()
+
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	select {
+	case <-time.After(500 * time.Millisecond):
+		if err := cmd.Process.Kill(); err != nil {
+			log.Fatal("failed to kill process: ", err)
+		}
+		log.Println("process killed as timeout reached")
+		return "", errors.New("Timed out")
+	case err := <-done:
+		if err != nil {
+			log.Fatalf("process finished with error = %v", err)
+			return "", errors.New("Execution Error")
+		}
+		log.Print("process finished successfully")
+	}
+
+	if errStdout != nil {
+		log.Fatal("failed to capture stdout\n")
+	}
+	outStr := string(stdoutBuf.Bytes())
+
+	return outStr, nil
 }
 
 func check_code(code string) bool {

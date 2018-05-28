@@ -2,23 +2,32 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path/filepath"
 )
 
+func renderTemplate(w http.ResponseWriter, name string, data interface{}) error {
+	// Ensure the template exists in the map.
+	tmpl, ok := templates[name]
+	if !ok {
+		return fmt.Errorf("The template %s does not exist.", name)
+	}
+
+	fmt.Println("template: ", name)
+
+	return tmpl.ExecuteTemplate(w, "base", data)
+}
+
 func llista(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.ParseFiles(
-		"static/templates/layout.html",
-		"static/templates/llista_problemes.html",
-	))
 	files, err := ioutil.ReadDir("./problemes")
 	if err != nil {
 		log.Fatal(err)
 	}
-	t.Execute(w, files)
+	if err := renderTemplate(w, "llista_problemes.html", files); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func problems(w http.ResponseWriter, r *http.Request) {
@@ -33,12 +42,11 @@ func problems(w http.ResponseWriter, r *http.Request) {
 func upload(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
-		t := template.Must(template.ParseFiles(
-			"static/templates/layout.html",
-			"static/templates/upload.html",
-		))
 		prog := filepath.Base(r.URL.String())
-		if err := t.Execute(w, prog); err != nil {
+		fmt.Println(prog, get_name(prog))
+		if !check_code(prog) {
+			error_(w, r, "Invalid code")
+		} else if err := renderTemplate(w, "upload.html", prog); err != nil {
 			log.Fatal(err)
 		}
 	} else {
@@ -57,27 +65,13 @@ func upload(w http.ResponseWriter, r *http.Request) {
 }
 
 func error_(w http.ResponseWriter, r *http.Request, message string) {
-	t := template.Must(template.ParseFiles(
-		"static/templates/layout.html",
-		"static/templates/error.html",
-	))
-	if err := t.Execute(w, message); err != nil {
+	if err := renderTemplate(w, "error.html", message); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles(
-		"static/templates/layout.html",
-		"static/templates/root.html",
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(w, nil)
-
-	if err != nil {
+	if err := renderTemplate(w, "root.html", nil); err != nil {
 		log.Fatal(err)
 	}
 }

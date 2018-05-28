@@ -32,3 +32,12 @@ func check_code(code string) bool {
 	}
 	return code_matcher.MatchString(code)
 }
+
+func get_name(code string) string {
+
+	name, ok := problem_names[code[:6]].(string)
+	if !ok {
+		return ""
+	}
+	return name
+}

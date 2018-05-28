@@ -3,28 +3,32 @@
 <div class="header">
     <h1>Llista de problemes</h1>
 </div>
-    <table class="pure-table pure-table-horizontal">
-        <thead>
-            <tr>
-                <th>codi</th>
-                <th>jutge</th>
-            </tr>
-        </thead>
-        <tbody>
-    {{range .}}
-            <tr>
-                <td>
-                    <a href="{{.Name}}">
-                        {{.Name}}
-                    </a>
-                </td>
-                <td>
-                    <a href="https://jutge.org/problems/{{.Name}}" target="_blank">
-                        jutge.org
-                    </a>
-                </td>
-            </tr>
-    {{end}}
-        </tbody>
-    </table>
+<table class="pure-table pure-table-horizontal center">
+    <thead>
+        <tr>
+            <th>codi</th>
+            <th>titol</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{range .}}
+        <tr>
+            <td>
+                <a href="{{.Name}}">
+                    {{.Name}}
+                </a>
+            </td>
+            <td>
+                {{get_name .Name}}
+            </td>
+            <td>
+                <a class="pure-button button-clear" href="https://jutge.org/problems/{{.Name}}" target="_blank">
+                    <i class="fas fa-external-link-square-alt"></i>
+                </a>
+            </td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
 {{end}}

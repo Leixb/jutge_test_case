@@ -59,7 +59,7 @@ func test(input, prog string) (string, error) {
 		return "", errors.New("Timed out")
 	case err := <-done:
 		if err != nil {
-			log.Fatalf("process finished with error = %v", err)
+			log.Printf("process finished with error = %v", err)
 			return "", errors.New("Execution Error")
 		}
 		log.Print("process finished successfully")

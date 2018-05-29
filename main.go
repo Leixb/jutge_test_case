@@ -43,7 +43,7 @@ func main() {
 	templates = make(map[string]*template.Template)
 	for _, layout := range layouts {
 		files := append(includes, layout)
-		fmt.Println("making", files)
+		log.Println("making", files)
 		templates[filepath.Base(layout)] =
 			template.Must(template.New("").Funcs(
 				template.FuncMap{
@@ -60,7 +60,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Serving on: http://localhost" + port)
+	log.Println("#####################################")
+	log.Println("# Serving on: http://localhost" + port)
+	log.Println("#####################################")
 	if err := http.ListenAndServe(port, h); err != nil {
 
 		log.Fatal("ListenAndServe: ", err)

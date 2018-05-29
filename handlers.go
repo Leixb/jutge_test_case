@@ -15,7 +15,7 @@ func renderTemplate(w http.ResponseWriter, name string, data interface{}) error 
 		return fmt.Errorf("The template %s does not exist.", name)
 	}
 
-	fmt.Println("template: ", name)
+	log.Println("Template: ", name)
 
 	return tmpl.ExecuteTemplate(w, "base", data)
 }
@@ -42,7 +42,7 @@ func problems(w http.ResponseWriter, r *http.Request) {
 func upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		prog := filepath.Base(r.URL.String())
-		fmt.Println(prog, get_name(prog))
+		log.Println(prog, get_name(prog))
 		if !check_code(prog) {
 			error_(w, r, "Invalid code")
 		} else if err := renderTemplate(w, "upload.html", prog); err != nil {
@@ -52,7 +52,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		input := r.FormValue("input")
 		prog := filepath.Base(r.URL.String())
-		fmt.Println("prog:", prog)
+		log.Println("Uploading:", prog, "[", r.UserAgent(), "]")
 		output, err := test(input, prog)
 		if err != nil {
 			error_(w, r, err.Error())
@@ -63,6 +63,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 }
 
 func error_(w http.ResponseWriter, r *http.Request, message string) {
+	log.Println("Got error:", message, "[", r.UserAgent(), "]")
 	if err := renderTemplate(w, "error.html", message); err != nil {
 		log.Fatal(err)
 	}

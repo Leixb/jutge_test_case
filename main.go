@@ -12,8 +12,8 @@ import (
 	"regexp"
 )
 
-var code_matcher *regexp.Regexp
-var problem_names map[string]interface{}
+var codeMatcher *regexp.Regexp
+var problemNames map[string]interface{}
 var templates map[string]*template.Template
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	h.HandleFunc("/problems/", problems)
 	h.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("static/css"))))
 
-	code_matcher = regexp.MustCompile("^[PX][0-9]{5}_(ca|en|es)$")
+	codeMatcher = regexp.MustCompile("^[PX][0-9]{5}_(ca|en|es)$")
 
 	layouts, err := filepath.Glob("./static/templates/*.html")
 	if err != nil {
@@ -47,7 +47,7 @@ func main() {
 		templates[filepath.Base(layout)] =
 			template.Must(template.New("").Funcs(
 				template.FuncMap{
-					"get_name": get_name,
+					"get_name": getName,
 				}).ParseFiles(files...))
 	}
 
@@ -55,7 +55,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = json.Unmarshal(f, &problem_names)
+	err = json.Unmarshal(f, &problemNames)
 	if err != nil {
 		log.Fatal(err)
 	}

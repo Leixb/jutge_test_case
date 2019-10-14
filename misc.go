@@ -14,7 +14,7 @@ import (
 
 func test(input, prog string) (string, error) {
 	file := filepath.Base(prog)
-	if !check_code(prog) {
+	if !checkCode(prog) {
 		return "", errors.New("Invalid code")
 	}
 	_, err := os.Stat("./problemes/" + file)
@@ -73,16 +73,16 @@ func test(input, prog string) (string, error) {
 	return outStr, nil
 }
 
-func check_code(code string) bool {
+func checkCode(code string) bool {
 	if len(code) != 9 {
 		return false
 	}
-	return code_matcher.MatchString(code)
+	return codeMatcher.MatchString(code)
 }
 
-func get_name(code string) string {
+func getName(code string) string {
 
-	name, ok := problem_names[code[:6]].(string)
+	name, ok := problemNames[code[:6]].(string)
 	if !ok {
 		return ""
 	}

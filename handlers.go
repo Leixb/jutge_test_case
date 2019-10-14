@@ -12,7 +12,7 @@ func renderTemplate(w http.ResponseWriter, name string, data interface{}) error 
 	// Ensure the template exists in the map.
 	tmpl, ok := templates[name]
 	if !ok {
-		return fmt.Errorf("The template %s does not exist.", name)
+		return fmt.Errorf("template %s does not exist", name)
 	}
 
 	log.Println("Template: ", name)
@@ -42,9 +42,9 @@ func problems(w http.ResponseWriter, r *http.Request) {
 func upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		prog := filepath.Base(r.URL.String())
-		log.Println(prog, get_name(prog))
-		if !check_code(prog) {
-			error_(w, r, "Invalid code")
+		log.Println(prog, getName(prog))
+		if !checkCode(prog) {
+			handlerError(w, r, "Invalid code")
 		} else if err := renderTemplate(w, "upload.html", prog); err != nil {
 			log.Fatal(err)
 		}
@@ -55,14 +55,14 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		log.Println("Uploading:", prog, "[", r.UserAgent(), "]")
 		output, err := test(input, prog)
 		if err != nil {
-			error_(w, r, err.Error())
+			handlerError(w, r, err.Error())
 		} else {
 			fmt.Fprintf(w, output)
 		}
 	}
 }
 
-func error_(w http.ResponseWriter, r *http.Request, message string) {
+func handlerError(w http.ResponseWriter, r *http.Request, message string) {
 	log.Println("Got error:", message, "[", r.UserAgent(), "]")
 	if err := renderTemplate(w, "error.html", message); err != nil {
 		log.Fatal(err)

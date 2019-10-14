@@ -1,0 +1,31 @@
+language: go
+sudo: false
+env:
+  - PROG=jutge_test_case
+
+before_install:
+  - go get github.com/mitchellh/gox
+
+install:
+  - # skip
+
+script:
+  - go get -t -v ./...
+  - diff -u <(echo -n) <(gofmt -d .)
+  - go vet $(go list ./... | grep -v /vendor/)
+  - go test -v -race ./...
+    # Only build binaries from the latest Go release.
+  - if [ -n "$TRAVIS_TAG" ]; then gox -os="linux darwin windows" -arch="amd64" -output="${PROG}.{{.OS}}.{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: hdy8qIl0VgUaQmdAXy8929hn+Gz28Iv2JIyHsMZjeWImlM+/U0Lf34BX1WAW+O89sTqsOHTRTrnc43rvnST5q5/otpjy4SeDSQ7HDXj7wVh+JQT3bxbbGKLLY11b0PtrbebCC+Y60DHpRVs22JFa6VRhDx2SyVsesSkUQrZjTIGr4SmFMVGPcJWtvdTwRMLM4IKlJ3x6AGzk4PN1wS8xMR4zxtoKNFhKfJRaZyQoTsAjDfcOD40r2/HbxpjHsD+4gj4XvcFScc3SFIXsZfWmCnvcOsY4t9zsjIl6B+sRW+M1t4ePDygA6UGG7VRxl7/mjQZwdmbTsDsXr2UJOc2PiVlwNIHCrWq2aTcJ+zFM5TQmB742aAg0R6jUdFBsxaUgUdIiDOIBAbEqVil4zYri8fGX7JAQnW52CUcwx6e+IiBpUcUO8epL1KWBj/x5iuFOJ4VGbTvI32phbkJhKn3mRGDsyyXlBhPY7yGaePT8TtwkQ02Y8Ibkrd9AqaiveF4Ux9CVaStd08I2ymUwCVHeoI1LIq61ln/forx6WfpjIFMJOj+Ir47Ho0VpiEXrd+2RPvTOdALo55zMik9bxpqavIG7a/g+ZaMk15Rsk1BVXx1efYKqsh7799O6LTFlrxe1yT+GtdwQppSrVI+PBYdxa/J4826ISpgTx3+MNQL+M5o=
+  file:
+    - "${PROG}.windows.amd64.exe"
+    - "${PROG}.darwin.amd64"
+    - "${PROG}.linux.amd64"
+  on:
+    repo: Leixb/jutge_test_case
+    tags: true
